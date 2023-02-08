@@ -1,185 +1,4 @@
-import random
 from collections import Counter
-class Card:
-    # Generate 52 card decks
-    def GenerateDeckAndShuffle(self):
-        suits = ['diamonds', 'hearts', 'clubs', 'spades'];
-        ranks = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
-        # Initialize empty lists to store cards
-        deck = [];
-        # To generate 52 card deck
-        for suit in suits:
-            for rank in ranks:
-                card = (rank, suit)    ;   
-                deck.append(card);
-        # To shuffle the deck randomly
-        random.shuffle(deck);
-        return deck;
-    
-    def DivideCards(self,deck):
-        # Divide the deck into 4 parts with 13 cards each.
-        deck1, deck2, deck3, deck4 = [], [], [], [];
-
-        for i, card in enumerate(deck):
-            if i < 13:
-                deck1.append(card);
-            elif i >= 13 and i < 26:
-                deck2.append(card);
-            elif i >= 26 and i < 39:
-                deck3.append(card);
-            else:
-                deck4.append(card);
-        return deck1, deck2, deck3, deck4;
-
-class Team:
-    TeamScore = [];
-    TeamName = "";
-    PlayersInTeam = [];
-    
-    # Constructor to initialize team name and players in team
-    def __init__(self, TeamName, PlayersInTeam):
-        self.TeamName = TeamName;
-        self.PlayersInTeam = PlayersInTeam;
-    # Function to add players to team
-    def add_player(self, player):
-        self.PlayersInTeam.append(player);
-
-    # Function to identify leading and non leading players
-    def IdentifyLeadAndNonLead(self,HandNo):
-        self.HandNo = HandNo;
-        #Returns leading and non leading players
-        if (self.TeamName == "NS"):
-            if (self.HandNo == 1):
-                return self.PlayersInTeam[0],self.PlayersInTeam[1];
-            elif (self.HandNo == 3):
-                return self.PlayersInTeam[1],self.PlayersInTeam[0];
-            elif (self.HandNo == 5):
-                return self.PlayersInTeam[0],self.PlayersInTeam[1];
-            elif (self.HandNo == 7):
-                return self.PlayersInTeam[1],self.PlayersInTeam[0];
-        elif (self.TeamName == "EW"):
-            if (self.HandNo == 2):
-                return self.PlayersInTeam[0],self.PlayersInTeam[1];
-            elif (self.HandNo == 4):
-                return self.PlayersInTeam[1],self.PlayersInTeam[0];
-            elif (self.HandNo == 6):
-                return self.PlayersInTeam[0],self.PlayersInTeam[1];
-            elif (self.HandNo == 8):
-                return self.PlayersInTeam[1],self.PlayersInTeam[0];
-
-class Player:
-    name = "";
-    id = "";
-    CardsReceived = CardsReceivedOrg = [];
-    CardsPlayed = []; #Need a fn to store this cards played
-    RemainingOriginal = [];
-    # Constructor to intialize player properties
-    def __init__(self,name,id):
-        self.name = name;
-        self.id = id;
-    
-    # Receive respective cards
-    def ReceiveCards(self,MyDeck):
-        self.CardsReceived = MyDeck;
-        self.CardsReceivedOrg = MyDeck;
-
-    # Show all cards except played cards
-    def ShowCards(self):
-        self.RemainingOriginal = remaining_cards = [card for card in self.CardsReceived if card not in self.CardsPlayed];
-        for i, (rank, suit) in enumerate(remaining_cards):
-            if suit == 'spades':
-                symbol = '♠'
-            elif suit == 'diamonds':
-                symbol = '♦'
-            elif suit == 'hearts':
-                symbol = '♥'
-            elif suit == 'clubs':
-                symbol = '♣'
-            else:
-                symbol = suit
-            remaining_cards[i] = (rank, symbol)
-        for i, card in enumerate(remaining_cards):
-            print(f"{card}");
-
-    # To play one card from the options
-    def PlayCards(self):
-        print("\nChoose your card:\n\nEnter rank and the suit");
-        print("\nA K Q J 10 9 8 7 6 5 2");
-        print("\nC = Clubs, D = Diamonds, H = Hearts, S = Spades");
-        ChosenCardRank = input("\nEnter the rank: ").upper();
-        ChosenCardSuit = input("\nEnter suit: ").upper();
-        if(ChosenCardSuit == 'C'):
-            ChosenCardSuit = "clubs";
-        elif(ChosenCardSuit == 'D'):
-            ChosenCardSuit = "diamonds";
-        elif(ChosenCardSuit == 'H'):
-            ChosenCardSuit = "hearts";
-        elif(ChosenCardSuit == "S"):
-            ChosenCardSuit = "spades";
-        else:
-            print("Error in selecting input, please try again");
-        if ChosenCardRank not in ['A','K','J','10','9','8','7','6','5','4','3','2']:
-            print("\nError in selecting input, please try again");
-        card = (ChosenCardRank,ChosenCardSuit);
-        if card in self.CardsReceived:
-            self.CardsPlayed.append(card);
-            self.CardsReceived.remove(card);
-        else:
-            print("\n You've entered a card that is not in your deck, please try again");
-            exit;
-        # for i, card in enumerate(self.CardsReceived):
-        #     if str(i) == ChosenCard:
-        #         ChosenCard = card;
-        #         break
-        # self.CardsPlayed.append(ChosenCard);
-        return self.CardsPlayed;
-
-    # To make a choice of pass/play/force
-    def MakeAMove(self):
-        move = input("\nEnter your choice of move : \n1: Play the card\n2: Pass the card\n3: Force the partner\n");
-        if(move == "1"):
-            move = "Play";
-        elif(move == "2"):
-            move = "Pass";
-        elif(move == "3"):
-            move = "Force";
-        else:
-            move = "Error";
-        return move
-    
-
-class Deal:
-    TotalHands = 1;
-    BonusPoints = "";
-    TotalHandsPlayed = [];
-    def StartDeal(self,NS,EW):
-        i = 1;
-        HandScore = 0;
-        while(i <= self.TotalHands):
-            self.TotalHandsPlayed.append(Hand());
-            if(i % 2 != 0):
-                #call function identifying leading and non leading players
-                self.LeadingPlayer,self.NonLeadingPlayer = NS.IdentifyLeadAndNonLead(i);
-                CardsPlayed, CardTrack = self.TotalHandsPlayed[i-1].PlayHands(self.LeadingPlayer,self.NonLeadingPlayer);
-                HandScore = self.TotalHandsPlayed[i-1].CheckCombination(CardsPlayed);
-                NS.TeamScore.append(HandScore);
-                print(HandScore);
-                print("\nEast-West team will be playing next:\n");
-                i+=1;
-            elif(i % 2 == 0):
-                #call function identifying leading and non leading players
-                self.LeadingPlayer,self.NonLeadingPlayer = EW.IdentifyLeadAndNonLead(i);
-                CardsPlayed, CardTrack = self.TotalHandsPlayed[i-1].PlayHands(self.LeadingPlayer,self.NonLeadingPlayer);
-                HandScore = self.TotalHandsPlayed[i-1].CheckCombination(CardsPlayed);
-                EW.TeamScore.append(HandScore);
-                if(i!=8):
-                    print("\nNorth-South team will be playing next:\n");
-                else:
-                    print("\nA deal is completed\n");
-                i+=1;
-
-    # Bonus calculations and leftover processing happens here
-
 class Hand:
     HandScore = "";
     TotalCards = 5;
@@ -233,9 +52,26 @@ class Hand:
                                 self.NextTurn = "NonLeadingPlayer";
                                 self.x+=1;
                             elif(move == "Force"):
-                                pass;
+                                print("\nNon-Leading player "+NonLeadingPlayerObj.name+" is playing now:\n");
+                                self.CardsLeft = 5 - (self.x-1); #To find rest of the cards to be played
+                                self.i = 1;
+                                while(self.i<=self.CardsLeft):
+                                    NonLeadingPlayerObj.ShowCards();
+                                    self.CardsPlaying = NonLeadingPlayerObj.PlayCards();
+                                    self.TrackCards.append("LeadingPlayer");
+                                    self.i+=1;
+                                break;
                     elif(move == "Force"):
-                        pass;
+                        print("\nLeading player "+LeadingPlayerObj.name+" is playing now:\n");
+                        self.CardsLeft = 5 - (self.x-1); #To find rest of the cards to be played
+                        self.i = 1;
+                        LeadingPlayerObj.ShowCards();
+                        while(self.i<=self.CardsLeft):
+                            
+                            self.CardsPlaying = LeadingPlayerObj.PlayCards();
+                            self.TrackCards.append("NonLeadingPlayer");
+                            self.i+=1;
+                        break;
                     elif(move == "Error"):
                         print("Error in selecting option, please try again");
 
@@ -271,11 +107,32 @@ class Hand:
                                 self.NextTurn = "LeadingPlayer";
                                 self.x+=1;
                             elif(move == "Force"):
-                               pass;
+                                print("\nLeading player "+LeadingPlayerObj.name+" is playing now:\n");
+                                self.CardsLeft = 5 - (self.x-1); #To find rest of the cards to be played
+                                self.i = 1;
+                                while(self.i<=self.CardsLeft):
+                                    LeadingPlayerObj.ShowCards();
+                                    self.CardsPlaying = LeadingPlayerObj.PlayCards();
+                                    self.TrackCards.append("LeadingPlayer");
+                                    self.i+=1;
+                                break;
                     elif(move == "Force"):
-                       pass;
+                        print("\nNon-Leading player "+NonLeadingPlayerObj.name+" is playing now:\n");
+                        self.CardsLeft = 5 - (self.x-1); #To find rest of the cards to be played
+                        self.i = 1;
+                        while(self.i<=self.CardsLeft):
+                            NonLeadingPlayerObj.ShowCards();
+                            self.CardsPlaying = NonLeadingPlayerObj.PlayCards();
+                            self.TrackCards.append("NonLeadingPlayer");
+                            self.i+=1;
+                        break;
                     elif(move == "Error"):
                         print("Error in selecting option, please try again");
+        # print(self.CardsPlaying);
+        # print("leading left\n");
+        # print(LeadingPlayerObj.CardsReceived);
+        # print("nonleading left\n");
+        # print(NonLeadingPlayerObj.CardsReceived);
         return self.CardsPlaying,self.TrackCards;
 
     def CheckCombination(self,CardsPlaying):
@@ -360,44 +217,3 @@ class Hand:
         else:
             print("\nNo combination found!");
         
-class Game:
-    def StartGame(self):
-        print("Concerto game starts: \n");
-
-        # 4 Player object created
-        player1 = Player("North","1"); 
-        player2 = Player("East","2");
-        player3 = Player("South","3");
-        player4 = Player("West","4");
-
-        # Assign players to different teams
-        NS = Team("NS",[]);
-        EW = Team("EW",[]);
-        NS.add_player(player1);
-        NS.add_player(player3);
-        EW.add_player(player2);
-        EW.add_player(player4);
-        
-        card = Card();
-        cards = [];
-        cards = card.GenerateDeckAndShuffle();
-
-        #Divide and allocate cards to 4 players
-        deck1,deck2,deck3,deck4 = [],[],[],[];
-        deck1,deck2,deck3,deck4 = card.DivideCards(cards);
-
-        #Allocate cards to players after shuffling
-        player1.ReceiveCards(deck1);
-        player2.ReceiveCards(deck2);
-        player3.ReceiveCards(deck3);
-        player4.ReceiveCards(deck4);
-
-        #test deal obj creation
-        deal = Deal();
-        deal.StartDeal(NS,EW);
-        
-
-game = Game();
-game.StartGame();
-
-
