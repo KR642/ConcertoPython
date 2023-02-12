@@ -5,9 +5,10 @@ class Player:
     CardsPlayed = []; #Need a fn to store this cards played
     RemainingOriginal = [];
     # Constructor to intialize player properties
-    def __init__(self,name,id):
+    def __init__(self,name,id,CardsPlayed):
         self.name = name;
         self.id = id;
+        self.CardsPlayed = CardsPlayed;
     
     # Receive respective cards
     def ReceiveCards(self,MyDeck):
@@ -31,14 +32,14 @@ class Player:
             remaining_cards[i] = (rank, symbol)
         for i, card in enumerate(remaining_cards):
             print(f"{card}");
-
+  
     # To play one card from the options
     def PlayCards(self):
         print("\nChoose your card:\n\nEnter rank and the suit");
         print("\nA K Q J 10 9 8 7 6 5 2");
         print("\nC = Clubs, D = Diamonds, H = Hearts, S = Spades");
         ChosenCardRank = input("\nEnter the rank: ").upper();
-        ChosenCardSuit = input("\nEnter suit: ").upper();
+        ChosenCardSuit = input("Enter suit: ").upper();
         if(ChosenCardSuit == 'C'):
             ChosenCardSuit = "clubs";
         elif(ChosenCardSuit == 'D'):
@@ -58,12 +59,27 @@ class Player:
         else:
             print("\n You've entered a card that is not in your deck, please try again");
             exit;
-        # for i, card in enumerate(self.CardsReceived):
-        #     if str(i) == ChosenCard:
-        #         ChosenCard = card;
-        #         break
-        # self.CardsPlayed.append(ChosenCard);
         return self.CardsPlayed;
+    
+    # To show played cards
+    def ShowCardPlaying(self):
+        for i, (rank, suit) in enumerate(self.CardsPlayed):
+            if suit == 'spades':
+                symbol = '♠'
+            elif suit == 'diamonds':
+                symbol = '♦'
+            elif suit == 'hearts':
+                symbol = '♥'
+            elif suit == 'clubs':
+                symbol = '♣'
+            else:
+                symbol = suit
+            self.CardsPlayed[i] = (rank, symbol)
+        print("\nCards Played:");
+        for item in self.CardsPlayed:
+            print(item[0], item[1], end="  ")
+        print()
+      
 
     # To make a choice of pass/play/force
     def MakeAMove(self):
@@ -78,7 +94,3 @@ class Player:
             move = "Error";
         return move
     
-
-
-
-  
