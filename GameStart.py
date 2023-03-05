@@ -120,7 +120,7 @@ class Player:
             ChosenCardSuit = "spades";
         else:
             print("Error in selecting input, please try again");
-        if ChosenCardRank not in ['A','K','J','10','9','8','7','6','5','4','3','2']:
+        if ChosenCardRank not in ['A','K','Q','J','10','9','8','7','6','5','4','3','2']:
             print("\nError in selecting input, please try again");
         card = (ChosenCardRank,ChosenCardSuit);
         if card in self.CardsReceived:
@@ -166,7 +166,7 @@ class Player:
     
 
 class Deal:
-    TotalHands = 8;
+    TotalHands = 2;
     BonusPoints = "";
     TotalHandsPlayed = [];
     def StartDeal(self,NS,EW):

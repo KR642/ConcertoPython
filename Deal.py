@@ -1,6 +1,6 @@
 from Hand import Hand
 class Deal:
-    TotalHands = 8;
+    TotalHands = 4;
     BonusPoints = "";
     TotalHandsPlayed = [];
     def StartDeal(self,NS,EW):
@@ -34,59 +34,87 @@ class Deal:
     #To find best 5 cards from the leftover cards
     @staticmethod
     def BestFiveCard(CardsLeft):
-        RankCounts = {}
-        Suits = {}
-        for card in CardsLeft:
-            rank, suit = card
-            RankCounts[rank] = RankCounts.get(rank, 0) + 1
-            Suits[suit] = Suits.get(suit, 0) + 1
-            
-        SortedRanks = sorted(RankCounts.keys(), key=lambda x: RankCounts[x], reverse=True)
+        cards = CardsLeft;
+        values = {'2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, '10': 10, 'J': 11, 'Q': 12, 'K': 13, 'A': 14}
+        suits = set([card[1] for card in cards])
 
-        # Check for a straight
-        for i in range(len(SortedRanks) - 4):
-            if int(SortedRanks[i]) - int(SortedRanks[i + 4]) == 4:
-                StraightRank = SortedRanks[i:i + 5]
-                return [card for card in CardsLeft if card[0] in StraightRank][:5]
-        
-        # Check for flush
-        for suit, count in Suits.items():
-            if count >= 5:
-                FlushCardsLeft = [card for card in CardsLeft if card[1] == suit]
-                FlushRanks = [card[0] for card in FlushCardsLeft]
-                return [card for card in FlushCardsLeft if card[0] in sorted(FlushRanks, reverse=True)][:5]
-        
+        # Check for straight flush
+        flush_suits = [card[1] for card in cards]
+        for suit in suits:
+            suit_cards = [card for card in cards if card[1] == suit]
+            if len(suit_cards) >= 5:
+                suit_card_values = sorted([values[card[0]] for card in suit_cards], reverse=True)
+                for i in range(len(suit_card_values) - 4):
+                    if suit_card_values[i] == suit_card_values[i+4] + 4:
+                        straight_flush_cards = [(card[0], suit) for card in suit_cards if values[card[0]] in range(suit_card_values[i+4], suit_card_values[i]+1)]
+                        return (straight_flush_cards)
+
         # Check for four of a kind
-        if len(SortedRanks) >= 4 and RankCounts[SortedRanks[0]] == 4:
-            FourRank = SortedRanks[0]
-            return [card for card in CardsLeft if card[0] == FourRank][:4] + [card for card in CardsLeft if card[0] == SortedRanks[-1]][:1]
+        values_count = {card[0]: 0 for card in cards}
+        for card in cards:
+            values_count[card[0]] += 1
+        for value, count in values_count.items():
+            if count == 4:
+                four_of_a_kind_cards = [card for card in cards if card[0] == value]
+                remaining_cards = [card for card in cards if card[0] != value]
+                return (four_of_a_kind_cards + sorted(remaining_cards, key=lambda x: values[x[0]], reverse=True)[:1])
 
-        # Check for a full house
-        if len(SortedRanks) >= 3 and RankCounts[SortedRanks[0]] == 3 and RankCounts[SortedRanks[1]] == 2:
-            ThreeRank = SortedRanks[0]
-            TwoRank = SortedRanks[1]
-            return [card for card in CardsLeft if card[0] == ThreeRank][:3] + [card for card in CardsLeft if card[0] == TwoRank][:2]
-        
-        # Check for three of a kind
-        if len(SortedRanks) >= 3 and RankCounts[SortedRanks[0]] == 3:
-            ThreeRank = SortedRanks[0]
-            return [card for card in CardsLeft if card[0] == ThreeRank][:3] + [card for card in CardsLeft if card[0] == SortedRanks[-2]][:1] + [card for card in CardsLeft if card[0] == SortedRanks[-1]][:1]
+        # Check for full house
+        three_of_a_kind_values = [value for value, count in values_count.items() if count == 3]
+        pairs = [value for value, count in values_count.items() if count == 2]
+        if len(three_of_a_kind_values) >= 1 and len(pairs) >= 1:
+            three_of_a_kind_value = max(three_of_a_kind_values, key=lambda x: values[x])
+            pair_value = max(pairs, key=lambda x: values[x])
+            full_house_cards = [card for card in cards if card[0] == three_of_a_kind_value or card[0] == pair_value]
+            return (full_house_cards)
+
+        # Check for flush
+        for suit in suits:
+            suit_cards = [card for card in cards if card[1] == suit]
+            if len(suit_cards) >= 5:
+                flush_cards = sorted(suit_cards, key=lambda x: values[x[0]], reverse=True)[:5]
+                return (flush_cards)
+
+        # Check for straight
+        unique_values = list(set([card[0] for card in cards]))
+        unique_values.sort(key=lambda x: values[x], reverse=True)
+        straight_values = []
+        for i in range(len(unique_values)-4):
+            if values[unique_values[i]] == values[unique_values[i+4]] + 4:
+                straight_values = unique_values[i:i+5]
+                break
+        if straight_values:
+            straight_cards = [(value, suit) for value in straight_values for suit in suits]
+            return (straight_cards)
+
+            # Check for three of a kind
+        three_of_a_kind_values = [value for value, count in values_count.items() if count == 3]
+        if len(three_of_a_kind_values) >= 1:
+            three_of_a_kind_value = max(three_of_a_kind_values, key=lambda x: values[x])
+            three_of_a_kind_cards = [card for card in cards if card[0] == three_of_a_kind_value]
+            remaining_cards = [card for card in cards if card[0] != three_of_a_kind_value]
+            return (three_of_a_kind_cards + sorted(remaining_cards, key=lambda x: values[x[0]], reverse=True)[:2])
 
         # Check for two pair
-        if len(SortedRanks) >= 2 and RankCounts[SortedRanks[0]] == 2 and RankCounts[SortedRanks[1]] == 2:
-            FirstPairRank = SortedRanks[0]
-            SecondPairRank = SortedRanks[1]
-            return [card for card in CardsLeft if card[0] == FirstPairRank][:2] + [card for card in CardsLeft if card[0] == SecondPairRank][:2] + [card for card in CardsLeft if card[0] == SortedRanks[-1]][:1]
+        pair_values = [value for value, count in values_count.items() if count == 2]
+        if len(pair_values) >= 2:
+            pair_values.sort(key=lambda x: values[x], reverse=True)
+            pair_cards = []
+            for value in pair_values[:2]:
+                pair_cards += [card for card in cards if card[0] == value]
+            remaining_cards = [card for card in cards if card[0] != pair_values[0] and card[0] != pair_values[1]]
+            return (pair_cards + [max(remaining_cards, key=lambda x: values[x[0]])])
 
-        # Check for a pair
-        if len(SortedRanks) >= 2 and RankCounts[SortedRanks[0]] == 2:
-            PairRank = SortedRanks[0]
-            return [card for card in CardsLeft if card[0] == PairRank][:2] + [card for card in CardsLeft if card[0] != PairRank][:3]
+        # Check for one pair
+        pair_values = [value for value, count in values_count.items() if count == 2]
+        if len(pair_values) == 1:
+            pair_cards = [card for card in cards if card[0] == pair_values[0]]
+            remaining_cards = [card for card in cards if card[0] != pair_values[0]]
+            return (pair_cards + sorted(remaining_cards, key=lambda x: values[x[0]], reverse=True)[:3])
 
-        # Return the highest CardsLeft
-        return [card for card in CardsLeft if card[0] == SortedRanks[0]][:1] + [card for card in CardsLeft if card[0] == SortedRanks[1]][:1] + [card for card in CardsLeft if card[0] == SortedRanks[2]][:1] + [card for card in CardsLeft if card[0] == SortedRanks[3]][:1] + [card for card in CardsLeft if card[0] == SortedRanks[4]][:1]
+        # High card
+        return (sorted(cards, key=lambda x: values[x[0]], reverse=True)[:5])
 
-    
     # Bonus calculations and leftover processing happens here
     def CalculateBonus(self,NS,EW):
         NSSumOfScores = EWSumOfScores = 0;
@@ -100,7 +128,7 @@ class Deal:
         TempHandObj = Hand([],[]);
         if(NSSumOfScores > EWSumOfScores):   
             # Display leftover cards
-            print("North-South is leading with "+NSSumOfScores);
+            print("North-South is leading with "+str(NSSumOfScores));
             print("Leftover cards of East-West");
             TempHandObj.DisplayCards(self.EWCardsLeft);
 
@@ -120,9 +148,9 @@ class Deal:
 
             self.LeftoverScore = self.LeftoverScore * 10;
             EW.TeamScore.append(self.LeftoverScore);
-            print("Bonus earned by North-South : "+self.LeftoverScore);
+            print("Bonus earned by North-South : "+str(self.LeftoverScore));
         elif(NSSumOfScores == EWSumOfScores):
-            print("North-South is leading with "+NSSumOfScores);
+            print("North-South is leading with "+str(NSSumOfScores));
             print("Leftover cards of East-West");
             # Display leftover cards
             TempHandObj.DisplayCards(self.EWCardsLeft);
@@ -141,10 +169,10 @@ class Deal:
             TrackCards = [TrackCards1[i] for i in indexes];
             self.LeftoverScore = TempHandObj.CheckCombination(CardsPlaying,TrackCards);
             self.LeftoverScore = self.LeftoverScore * 10;
-            print("Bonus earned by North-South : "+self.LeftoverScore);
+            print("Bonus earned by North-South : "+str(self.LeftoverScore));
             EW.TeamScore.append(self.LeftoverScore);
         elif(EWSumOfScores > NSSumOfScores):
-            print("East-West is leading with "+EWSumOfScores);
+            print("East-West is leading with "+str(EWSumOfScores));
             print("Leftover cards of North-South");
             # Display leftover cards
             TempHandObj.DisplayCards(self.NSCardsLeft);
@@ -164,5 +192,5 @@ class Deal:
 
             self.LeftoverScore = TempHandObj.CheckCombination(CardsPlaying,TrackCards);
             self.LeftoverScore = self.LeftoverScore * 10;
-            print("Bonus earned by East-West : "+self.LeftoverScore);
+            print("Bonus earned by East-West : "+str(self.LeftoverScore));
             NS.TeamScore.append(self.LeftoverScore);

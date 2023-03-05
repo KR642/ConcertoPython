@@ -2,9 +2,10 @@ class Team:
     TeamScore = [];
     TeamName = "";
     PlayersInTeam = [];
-    
+    TeamPos = "";
     # Constructor to initialize team name and players in team
-    def __init__(self, TeamName, PlayersInTeam,TeamScore):
+    def __init__(self, TeamName, TeamPos, PlayersInTeam,TeamScore):
+        self.TeamPos = TeamPos;
         self.TeamName = TeamName;
         self.PlayersInTeam = PlayersInTeam;
         self.TeamScore = TeamScore;
@@ -16,7 +17,7 @@ class Team:
     def IdentifyLeadAndNonLead(self,HandNo):
         self.HandNo = HandNo;
         #Returns leading and non leading players
-        if (self.TeamName == "NS"):
+        if (self.TeamPos == "NS"):
             if (self.HandNo == 1):
                 return self.PlayersInTeam[0],self.PlayersInTeam[1];
             elif (self.HandNo == 3):
@@ -25,7 +26,7 @@ class Team:
                 return self.PlayersInTeam[0],self.PlayersInTeam[1];
             elif (self.HandNo == 7):
                 return self.PlayersInTeam[1],self.PlayersInTeam[0];
-        elif (self.TeamName == "EW"):
+        elif (self.TeamPos == "EW"):
             if (self.HandNo == 2):
                 return self.PlayersInTeam[0],self.PlayersInTeam[1];
             elif (self.HandNo == 4):
