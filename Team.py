@@ -5,10 +5,11 @@ class Team:
     TeamPos = "";
     # Constructor to initialize team name and players in team
     def __init__(self, TeamName, TeamPos, PlayersInTeam,TeamScore):
-        self.TeamPos = TeamPos;
         self.TeamName = TeamName;
+        self.TeamPos = TeamPos;
         self.PlayersInTeam = PlayersInTeam;
         self.TeamScore = TeamScore;
+        
     # Function to add players to team
     def add_player(self, player):
         self.PlayersInTeam.append(player);

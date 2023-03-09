@@ -17,21 +17,23 @@ class Player:
 
     # Show all cards except played cards
     def ShowCards(self):
-        self.RemainingOriginal = remaining_cards = [card for card in self.CardsReceived if card not in self.CardsPlayed];
-        for i, (rank, suit) in enumerate(remaining_cards):
-            if suit == 'spades':
-                symbol = '♠'
-            elif suit == 'diamonds':
-                symbol = '♦'
-            elif suit == 'hearts':
-                symbol = '♥'
-            elif suit == 'clubs':
-                symbol = '♣'
-            else:
-                symbol = suit
-            remaining_cards[i] = (rank, symbol)
+        remaining_cards = [card for card in self.CardsReceived if card not in self.CardsPlayed];
+        self.RemainingOriginal = remaining_cards;
+        # for i, (rank, suit) in enumerate(remaining_cards):
+        #     if suit == 'spades':
+        #         symbol = '♠'
+        #     elif suit == 'diamonds':
+        #         symbol = '♦'
+        #     elif suit == 'hearts':
+        #         symbol = '♥'
+        #     elif suit == 'clubs':
+        #         symbol = '♣'
+        #     else:
+        #         symbol = suit
+        #     remaining_cards[i] = (rank, symbol)
         for i, card in enumerate(remaining_cards):
             print(f"{card}");
+        return self.RemainingOriginal;
   
     # To play one card from the options
     def PlayCards(self):

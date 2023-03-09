@@ -1,9 +1,9 @@
 from Hand import Hand
 class Deal:
-    TotalHands = 4;
+    TotalHands = 8;
     BonusPoints = "";
     TotalHandsPlayed = [];
-    def StartDeal(self,NS,EW):
+    def StartDeal(self,NS,EW,gui,root):
         i = 1;
         HandScore = 0;
         while(i <= self.TotalHands):
@@ -11,25 +11,25 @@ class Deal:
             if(i % 2 != 0):
                 #call function identifying leading and non leading players
                 self.LeadingPlayer,self.NonLeadingPlayer = NS.IdentifyLeadAndNonLead(i);
-                CardsPlayed, CardTrack = self.TotalHandsPlayed[i-1].PlayHands(self.LeadingPlayer,self.NonLeadingPlayer);
-                HandScore = self.TotalHandsPlayed[i-1].CheckCombination(CardsPlayed,CardTrack);
+                CardsPlayed, CardTrack = self.TotalHandsPlayed[i-1].PlayHands(self.LeadingPlayer,self.NonLeadingPlayer,i,gui,root);
+                HandScore = self.TotalHandsPlayed[i-1].CheckCombination(CardsPlayed,CardTrack,gui);
                 NS.TeamScore.append(HandScore);
-                print("Scores of North-South");
-                print(HandScore);
-                print("\nEast-West team will be playing next:\n");
+                gui.WriteToConsole("Scores of "+NS.TeamName+" is\n");
+                gui.WriteToConsole(HandScore);
+                gui.WriteToConsole("\n"+EW.TeamName+" will be playing next:\n");
                 i+=1;
             elif(i % 2 == 0):
                 #call function identifying leading and non leading players
                 self.LeadingPlayer,self.NonLeadingPlayer = EW.IdentifyLeadAndNonLead(i);
-                CardsPlayed, CardTrack = self.TotalHandsPlayed[i-1].PlayHands(self.LeadingPlayer,self.NonLeadingPlayer);
-                HandScore = self.TotalHandsPlayed[i-1].CheckCombination(CardsPlayed,CardTrack);
+                CardsPlayed, CardTrack = self.TotalHandsPlayed[i-1].PlayHands(self.LeadingPlayer,self.NonLeadingPlayer,i,gui,root);
+                HandScore = self.TotalHandsPlayed[i-1].CheckCombination(CardsPlayed,CardTrack,gui);
                 EW.TeamScore.append(HandScore);
-                print("Scores of East-West");
-                print(HandScore);
+                gui.WriteToConsole("Scores of "+EW.TeamName+" is\n");
+                gui.WriteToConsole(HandScore);
                 if(i!=8):
-                    print("\nNorth-South team will be playing next:\n");
+                    gui.WriteToConsole("\n"+NS.TeamName+" will be playing next:\n");
                 else:
-                    print("\nA deal is completed\n");
+                    gui.WriteToConsole("\nA deal is completed\n");
                 i+=1;
     #To find best 5 cards from the leftover cards
     @staticmethod
@@ -115,21 +115,22 @@ class Deal:
         # High card
         return (sorted(cards, key=lambda x: values[x[0]], reverse=True)[:5])
 
+    
     # Bonus calculations and leftover processing happens here
-    def CalculateBonus(self,NS,EW):
+    def CalculateBonus(self,NS,EW,gui):
         NSSumOfScores = EWSumOfScores = 0;
         # Find the total scores of teams
         NSSumOfScores = sum(NS.TeamScore);
         EWSumOfScores = sum(EW.TeamScore);
         cardsOrgEW = self.EWCardsLeft = EW.PlayersInTeam[0].CardsReceived + EW.PlayersInTeam[1].CardsReceived;
         cardsOrgNS = self.NSCardsLeft = NS.PlayersInTeam[0].CardsReceived + NS.PlayersInTeam[1].CardsReceived;
-        print("\nBonus calculating..");
+        gui.WriteToConsole("\nBonus calculating..");
         # Find the leading team and getting the leftover cards accordingly
         TempHandObj = Hand([],[]);
         if(NSSumOfScores > EWSumOfScores):   
             # Display leftover cards
-            print("North-South is leading with "+str(NSSumOfScores));
-            print("Leftover cards of East-West");
+            gui.WriteToConsole(NS.TeamName+" is leading with "+str(NSSumOfScores));
+            gui.WriteToConsole("Leftover cards of East-West");
             TempHandObj.DisplayCards(self.EWCardsLeft);
 
             #Find the best 5 cards among the leftover cards
@@ -145,13 +146,12 @@ class Deal:
                     indexes.append(i);
             TrackCards = [TrackCards1[i] for i in indexes];
             self.LeftoverScore =TempHandObj.CheckCombination(CardsPlaying,TrackCards);
-
             self.LeftoverScore = self.LeftoverScore * 10;
-            EW.TeamScore.append(self.LeftoverScore);
-            print("Bonus earned by North-South : "+str(self.LeftoverScore));
+            NS.TeamScore.append(self.LeftoverScore);
+            gui.WriteToConsole("Bonus earned by"+NS.TeamName+":"+str(self.LeftoverScore));
         elif(NSSumOfScores == EWSumOfScores):
-            print("North-South is leading with "+str(NSSumOfScores));
-            print("Leftover cards of East-West");
+            gui.WriteToConsole(NS.TeamName+" is tied with "+EW.TeamName);
+            gui.WriteToConsole("Leftover cards of East-West");
             # Display leftover cards
             TempHandObj.DisplayCards(self.EWCardsLeft);
 
@@ -169,11 +169,11 @@ class Deal:
             TrackCards = [TrackCards1[i] for i in indexes];
             self.LeftoverScore = TempHandObj.CheckCombination(CardsPlaying,TrackCards);
             self.LeftoverScore = self.LeftoverScore * 10;
-            print("Bonus earned by North-South : "+str(self.LeftoverScore));
-            EW.TeamScore.append(self.LeftoverScore);
+            gui.WriteToConsole("Bonus earned by"+NS.TeamName+":"+str(self.LeftoverScore));
+            NS.TeamScore.append(self.LeftoverScore);
         elif(EWSumOfScores > NSSumOfScores):
-            print("East-West is leading with "+str(EWSumOfScores));
-            print("Leftover cards of North-South");
+            gui.WriteToConsole(EW.TeamName+" is leading with "+str(EWSumOfScores));
+            gui.WriteToConsole("Leftover cards of North-South");
             # Display leftover cards
             TempHandObj.DisplayCards(self.NSCardsLeft);
 
@@ -192,5 +192,6 @@ class Deal:
 
             self.LeftoverScore = TempHandObj.CheckCombination(CardsPlaying,TrackCards);
             self.LeftoverScore = self.LeftoverScore * 10;
-            print("Bonus earned by East-West : "+str(self.LeftoverScore));
-            NS.TeamScore.append(self.LeftoverScore);
+            gui.WriteToConsole("Bonus earned by"+EW.TeamName+":"+str(self.LeftoverScore));
+            EW.TeamScore.append(self.LeftoverScore);
+

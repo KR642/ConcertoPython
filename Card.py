@@ -1,4 +1,3 @@
-from operator import le
 import random
 from collections import Counter
 class Card:
@@ -15,10 +14,6 @@ class Card:
                 deck.append(card);
         # To shuffle the deck randomly
         random.shuffle(deck);
-        # testing
-        deck = deck[:32];
-        print(len(deck));
-        ##
         return deck;
     
     def DivideCards(self,deck):
@@ -26,21 +21,12 @@ class Card:
         deck1, deck2, deck3, deck4 = [], [], [], [];
 
         for i, card in enumerate(deck):
-            if i < 8:
+            if i < 13:
                 deck1.append(card);
-            elif i >= 8 and i < 16:
+            elif i >= 13 and i < 26:
                 deck2.append(card);
-            elif i >= 16 and i < 24:
+            elif i >= 26 and i < 39:
                 deck3.append(card);
             else:
                 deck4.append(card);
-
-            # if i < 13:
-            #     deck1.append(card);
-            # elif i >= 13 and i < 26:
-            #     deck2.append(card);
-            # elif i >= 26 and i < 39:
-            #     deck3.append(card);
-            # else:
-            #     deck4.append(card);
         return deck1, deck2, deck3, deck4;

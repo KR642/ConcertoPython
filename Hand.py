@@ -32,7 +32,8 @@ class Hand:
         print()
     
     # To play a hand with leading player and non leading player 
-    def PlayHands(self, LeadingPlayerObj, NonLeadingPlayerObj):
+    def PlayHands(self, LeadingPlayerObj, NonLeadingPlayerObj,HandNo,gui,root):
+        #pass gui object to add widgets
         self.ConsecutivePass = False;
         self.NextTurn = "";
         self.x = 1; # The number of cards
@@ -42,73 +43,115 @@ class Hand:
         while(self.x<=self.TotalCards):
             if(self.x == 1):
                 print("\nLeading player "+LeadingPlayerObj.name+" is playing now:\n");
-                LeadingPlayerObj.ShowCards();
-                LeadingPlayerObj.PlayCards();
+                gui.WriteToConsole("\nLeading player "+LeadingPlayerObj.name+" is playing now:\n");
+                remaining_cards = LeadingPlayerObj.ShowCards();
+                MoveDisplay = False;
+                card,move = gui.DisplayDeckAndMoves(remaining_cards,MoveDisplay,root);
+                LeadingPlayerObj.CardsPlayed.append(card);
                 self.CardsPlaying.append(LeadingPlayerObj.CardsPlayed[-1]);
-                Hand.DisplayCards(self.CardsPlaying);
-                self.TrackMoves[0]="Play";
+                # LeadingPlayerObj.PlayCards();
+                # Hand.DisplayCards(self.CardsPlaying);
+                gui.DisplayCardsPlayed(self.CardsPlaying,HandNo,root);
+                self.TrackMoves[0] = "Play";
                 self.TrackCards.append("LeadingPlayer");
                 self.NextTurn = "NonLeadingPlayer";
                 self.x+=1;
             else:
                 if(self.NextTurn == "NonLeadingPlayer"):
                     print("\nNon-Leading player "+NonLeadingPlayerObj.name+" making a move now:\n");
-                    NonLeadingPlayerObj.ShowCards();
-                    move = NonLeadingPlayerObj.MakeAMove();
+                    gui.WriteToConsole("\nNon-Leading player "+NonLeadingPlayerObj.name+" making a move now:\n");
+                    remaining_cards = NonLeadingPlayerObj.ShowCards();
+                    MoveDisplay = True;
+                    card,move = gui.DisplayDeckAndMoves(remaining_cards,MoveDisplay,root);
+                    # move = NonLeadingPlayerObj.MakeAMove();
                     self.TrackMoves[self.x] = move;
                     self.ConsecutivePass = self.TrackMoves[self.x-2] == "Pass" and self.TrackMoves[self.x+1] == "Pass";
                     if(move == "Play"):
                             print("\nNon-Leading player "+NonLeadingPlayerObj.name+" playing now:\n")
-                            NonLeadingPlayerObj.PlayCards();
+                            gui.WriteToConsole("\nNon-Leading player "+NonLeadingPlayerObj.name+" playing now:\n")
+                            remaining_cards = NonLeadingPlayerObj.ShowCards();
+                            MoveDisplay = False;
+                            card,move = gui.DisplayDeckAndMoves(remaining_cards,MoveDisplay,root);
+                            NonLeadingPlayerObj.CardsPlayed.append(card);
                             self.CardsPlaying.append(NonLeadingPlayerObj.CardsPlayed[-1]);
-                            Hand.DisplayCards(self.CardsPlaying);
+                            # NonLeadingPlayerObj.PlayCards();
+                            # Hand.DisplayCards(self.CardsPlaying);
+                            gui.DisplayCardsPlayed(self.CardsPlaying,HandNo,root);
                             self.TrackCards.append("NonLeadingPlayer");
                             self.NextTurn = "LeadingPlayer";
                             self.x+=1;   
                     elif((move == "Pass") and self.ConsecutivePass != True):
                             print("\nLeading player "+LeadingPlayerObj.name+" making a move now:\n");
-                            LeadingPlayerObj.ShowCards();
-                            move = LeadingPlayerObj.MakeAMove();
+                            gui.WriteToConsole("\nLeading player "+LeadingPlayerObj.name+" making a move now:\n")
+                            remaining_cards = LeadingPlayerObj.ShowCards();
+                            MoveDisplay = True;
+                            card,move = gui.DisplayDeckAndMoves(remaining_cards,MoveDisplay,root);
+                            print(move)
+                            # move = LeadingPlayerObj.MakeAMove();
                             self.TrackMoves[self.x] = move;
                             self.ConsecutivePass = self.TrackMoves[self.x] == "Pass" and self.TrackMoves[self.x+1] == "Pass";
                             if(move == "Pass" and self.ConsecutivePass != True):
                                 print("\nNon-Leading player "+NonLeadingPlayerObj.name+" is playing now:\n");
-                                NonLeadingPlayerObj.ShowCards();
-                                NonLeadingPlayerObj.PlayCards();
+                                gui.WriteToConsole("\nNon-Leading player "+NonLeadingPlayerObj.name+" is playing now:\n")
+                                remaining_cards = NonLeadingPlayerObj.ShowCards();
+                                MoveDisplay = False;
+                                card,move = gui.DisplayDeckAndMoves(remaining_cards,MoveDisplay,root);
+                                NonLeadingPlayerObj.CardsPlayed.append(card);
                                 self.CardsPlaying.append(NonLeadingPlayerObj.CardsPlayed[-1]);
-                                Hand.DisplayCards(self.CardsPlaying);
+                                # NonLeadingPlayerObj.PlayCards();
+                                # Hand.DisplayCards(self.CardsPlaying);
+                                gui.DisplayCardsPlayed(self.CardsPlaying,HandNo,root);
                                 self.TrackCards.append("NonLeadingPlayer");
                                 self.NextTurn = "LeadingPlayer";
                                 self.x+=1;
                             elif(move == "Play"):
                                 print("\nLeading player "+LeadingPlayerObj.name+" is playing now:\n");
-                                LeadingPlayerObj.PlayCards();
+                                gui.WriteToConsole("\nLeading player "+LeadingPlayerObj.name+" is playing now:\n")
+                                remaining_cards = LeadingPlayerObj.ShowCards();
+                                MoveDisplay = False;
+                                card,move = gui.DisplayDeckAndMoves(remaining_cards,MoveDisplay,root);
+                                LeadingPlayerObj.CardsPlayed.append(card);
                                 self.CardsPlaying.append(LeadingPlayerObj.CardsPlayed[-1]);
-                                Hand.DisplayCards(self.CardsPlaying);
+                                # LeadingPlayerObj.PlayCards();
+                                # Hand.DisplayCards(self.CardsPlaying);
+                                gui.DisplayCardsPlayed(self.CardsPlaying,HandNo,root);
                                 self.TrackCards.append("LeadingPlayer");
                                 self.NextTurn = "NonLeadingPlayer";
                                 self.x+=1;
                             elif(move == "Force"):
                                 print("\nNon-Leading player "+NonLeadingPlayerObj.name+" is playing now:\n");
+                                gui.WriteToConsole("\nNon-Leading player "+NonLeadingPlayerObj.name+" is playing now:\n")
                                 self.CardsLeft = 5 - (self.x-1); #To find rest of the cards to be played
                                 self.i = 1;
                                 while(self.i<=self.CardsLeft):
-                                    NonLeadingPlayerObj.ShowCards();
-                                    NonLeadingPlayerObj.PlayCards();
+                                    remaining_cards = NonLeadingPlayerObj.ShowCards();
+                                    MoveDisplay = False;
+                                    card,move = gui.DisplayDeckAndMoves(remaining_cards,MoveDisplay,root);
+                                    NonLeadingPlayerObj.CardsPlayed.append(card);
                                     self.CardsPlaying.append(NonLeadingPlayerObj.CardsPlayed[-1]);
-                                    Hand.DisplayCards(self.CardsPlaying);
+                                    # NonLeadingPlayerObj.PlayCards();
+                                    # self.CardsPlaying.append(NonLeadingPlayerObj.CardsPlayed[-1]);
+                                    # Hand.DisplayCards(self.CardsPlaying);
+                                    gui.DisplayCardsPlayed(self.CardsPlaying,HandNo,root);
                                     self.TrackCards.append("NonLeadingPlayer");
                                     self.i+=1;
                                 break;
                     elif(move == "Force"):
                         print("\nLeading player "+LeadingPlayerObj.name+" is playing now:\n");
+                        gui.WriteToConsole("\nLeading player "+LeadingPlayerObj.name+" is playing now:\n")
                         self.CardsLeft = 5 - (self.x-1); #To find rest of the cards to be played
                         self.i = 1;
-                        LeadingPlayerObj.ShowCards();
+                        # LeadingPlayerObj.ShowCards();
                         while(self.i<=self.CardsLeft):
-                            LeadingPlayerObj.PlayCards();
+                            remaining_cards = LeadingPlayerObj.ShowCards();
+                            MoveDisplay = False;
+                            card,move = gui.DisplayDeckAndMoves(remaining_cards,MoveDisplay,root);
+                            LeadingPlayerObj.CardsPlayed.append(card);
                             self.CardsPlaying.append(LeadingPlayerObj.CardsPlayed[-1]);
-                            Hand.DisplayCards(self.CardsPlaying);
+                            # LeadingPlayerObj.PlayCards();
+                            # self.CardsPlaying.append(LeadingPlayerObj.CardsPlayed[-1]);
+                            # Hand.DisplayCards(self.CardsPlaying);
+                            gui.DisplayCardsPlayed(self.CardsPlaying,HandNo,root);
                             self.TrackCards.append("LeadingPlayer");
                             self.i+=1;
                         break;
@@ -117,62 +160,104 @@ class Hand:
 
                 elif(self.NextTurn == "LeadingPlayer"):
                     print("\nLeading player "+LeadingPlayerObj.name+" is making a move now:\n");
-                    LeadingPlayerObj.ShowCards();
-                    move = LeadingPlayerObj.MakeAMove();
+                    gui.WriteToConsole("\nLeading player "+LeadingPlayerObj.name+" is making a move now:\n")
+                    remaining_cards = LeadingPlayerObj.ShowCards();
+                    MoveDisplay = True;
+                    card,move = gui.DisplayDeckAndMoves(remaining_cards,MoveDisplay,root);
+                    # LeadingPlayerObj.ShowCards();
+                    # move = LeadingPlayerObj.MakeAMove();
                     self.TrackMoves[self.x] = move;
                     self.ConsecutivePass = self.TrackMoves[self.x] == "Pass" and self.TrackMoves[self.x+1] == "Pass";
                     if(move == "Play"):
                             print("\nLeading player "+LeadingPlayerObj.name+" is playing now:\n");
-                            LeadingPlayerObj.PlayCards();
+                            gui.WriteToConsole("\nLeading player "+LeadingPlayerObj.name+" is playing now:\n")
+                            remaining_cards = LeadingPlayerObj.ShowCards();
+                            MoveDisplay = False;
+                            card,move = gui.DisplayDeckAndMoves(remaining_cards,MoveDisplay,root);
+                            LeadingPlayerObj.CardsPlayed.append(card);
                             self.CardsPlaying.append(LeadingPlayerObj.CardsPlayed[-1]);
-                            Hand.DisplayCards(self.CardsPlaying);
+                            # LeadingPlayerObj.PlayCards();
+                            # self.CardsPlaying.append(LeadingPlayerObj.CardsPlayed[-1]);
+                            # Hand.DisplayCards(self.CardsPlaying);
+                            gui.DisplayCardsPlayed(self.CardsPlaying,HandNo,root);
                             self.TrackCards.append("LeadingPlayer");
                             self.NextTurn = "NonLeadingPlayer";
                             self.x+=1;   
                     elif((move == "Pass") and self.ConsecutivePass != True):
                             print("\nNon-Leading player "+NonLeadingPlayerObj.name+" is making a move now:\n");
-                            NonLeadingPlayerObj.ShowCards();
-                            move = NonLeadingPlayerObj.MakeAMove();
+                            gui.WriteToConsole("\nNon-Leading player "+NonLeadingPlayerObj.name+" is making a move now:\n")
+                            remaining_cards = NonLeadingPlayerObj.ShowCards();
+                            MoveDisplay = True;
+                            card,move = gui.DisplayDeckAndMoves(remaining_cards,MoveDisplay,root);
+                            # move = NonLeadingPlayerObj.MakeAMove();
                             self.TrackMoves[self.x] = move;
                             self.ConsecutivePass = self.TrackMoves[self.x] == "Pass" and self.TrackMoves[self.x+1] == "Pass";
                             if(move == "Pass" and self.ConsecutivePass != True):
                                 print("\nLeading player "+LeadingPlayerObj.name+" is playing now:\n");
-                                LeadingPlayerObj.ShowCards();
-                                LeadingPlayerObj.PlayCards();
+                                gui.WriteToConsole("\nLeading player "+LeadingPlayerObj.name+" is playing now:\n")
+                                remaining_cards = LeadingPlayerObj.ShowCards();
+                                MoveDisplay = False;
+                                card,move = gui.DisplayDeckAndMoves(remaining_cards,MoveDisplay,root);
+                                LeadingPlayerObj.CardsPlayed.append(card);
                                 self.CardsPlaying.append(LeadingPlayerObj.CardsPlayed[-1]);
-                                Hand.DisplayCards(self.CardsPlaying);
+                                # LeadingPlayerObj.ShowCards();
+                                # LeadingPlayerObj.PlayCards();
+                                # self.CardsPlaying.append(LeadingPlayerObj.CardsPlayed[-1]);
+                                # Hand.DisplayCards(self.CardsPlaying);
+                                gui.DisplayCardsPlayed(self.CardsPlaying,HandNo,root);
                                 self.TrackCards.append("LeadingPlayer");
                                 self.NextTurn = "NonLeadingPlayer";
                                 self.x+=1;
                             elif(move == "Play"):
                                 print("\nNon-Leading "+NonLeadingPlayerObj.name+" player is playing now:\n");
-                                NonLeadingPlayerObj.PlayCards();
+                                gui.WriteToConsole("\nNon-Leading "+NonLeadingPlayerObj.name+" player is playing now:\n")
+                                remaining_cards = NonLeadingPlayerObj.ShowCards();
+                                MoveDisplay = False;
+                                card,move = gui.DisplayDeckAndMoves(remaining_cards,MoveDisplay,root);
+                                NonLeadingPlayerObj.CardsPlayed.append(card);
                                 self.CardsPlaying.append(NonLeadingPlayerObj.CardsPlayed[-1]);
-                                Hand.DisplayCards(self.CardsPlaying);
+                                # NonLeadingPlayerObj.PlayCards();
+                                # self.CardsPlaying.append(NonLeadingPlayerObj.CardsPlayed[-1]);
+                                # Hand.DisplayCards(self.CardsPlaying);
+                                gui.DisplayCardsPlayed(self.CardsPlaying,HandNo,root);
                                 self.TrackCards.append("NonLeadingPlayer");
                                 self.NextTurn = "LeadingPlayer";
                                 self.x+=1;
                             elif(move == "Force"):
                                 print("\nLeading player "+LeadingPlayerObj.name+" is playing now:\n");
+                                gui.WriteToConsole("\nLeading player "+LeadingPlayerObj.name+" is playing now:\n")
                                 self.CardsLeft = 5 - (self.x-1); #To find rest of the cards to be played
                                 self.i = 1;
                                 while(self.i<=self.CardsLeft):
-                                    LeadingPlayerObj.ShowCards();
-                                    LeadingPlayerObj.PlayCards();
+                                    remaining_cards = LeadingPlayerObj.ShowCards();
+                                    MoveDisplay = False;
+                                    card,move = gui.DisplayDeckAndMoves(remaining_cards,MoveDisplay,root);
+                                    LeadingPlayerObj.CardsPlayed.append(card);
                                     self.CardsPlaying.append(LeadingPlayerObj.CardsPlayed[-1]);
-                                    Hand.DisplayCards(self.CardsPlaying);
+                                    # LeadingPlayerObj.ShowCards();
+                                    # LeadingPlayerObj.PlayCards();
+                                    # self.CardsPlaying.append(LeadingPlayerObj.CardsPlayed[-1]);
+                                    # Hand.DisplayCards(self.CardsPlaying);
+                                    gui.DisplayCardsPlayed(self.CardsPlaying,HandNo,root);
                                     self.TrackCards.append("LeadingPlayer");
                                     self.i+=1;
                                 break;
                     elif(move == "Force"):
                         print("\nNon-Leading player "+NonLeadingPlayerObj.name+" is playing now:\n");
+                        gui.WriteToConsole("\nNon-Leading player "+NonLeadingPlayerObj.name+" is playing now:\n")
                         self.CardsLeft = 5 - (self.x-1); #To find rest of the cards to be played
                         self.i = 1;
                         while(self.i<=self.CardsLeft):
-                            NonLeadingPlayerObj.ShowCards();
-                            NonLeadingPlayerObj.PlayCards();
+                            remaining_cards = NonLeadingPlayerObj.ShowCards();
+                            MoveDisplay = False;
+                            card,move = gui.DisplayDeckAndMoves(remaining_cards,MoveDisplay,root);
+                            NonLeadingPlayerObj.CardsPlayed.append(card);
                             self.CardsPlaying.append(NonLeadingPlayerObj.CardsPlayed[-1]);
-                            Hand.DisplayCards(self.CardsPlaying);
+                            # NonLeadingPlayerObj.ShowCards();
+                            # NonLeadingPlayerObj.PlayCards();
+                            # self.CardsPlaying.append(NonLeadingPlayerObj.CardsPlayed[-1]);
+                            # Hand.DisplayCards(self.CardsPlaying);
+                            gui.DisplayCardsPlayed(self.CardsPlaying,HandNo,root);
                             self.TrackCards.append("NonLeadingPlayer");
                             self.i+=1;
                         break;
@@ -180,7 +265,7 @@ class Hand:
                         print("Error in selecting option, please try again");
         return self.CardsPlaying,self.TrackCards;
 
-    def CheckCombination(self,CardsPlaying,TrackCards):
+    def CheckCombination(self,CardsPlaying,TrackCards,gui):
         ScoreofHand = 0;
         #Check for poker combination code and returns scores
         values = [card[0] for card in CardsPlaying]
@@ -222,11 +307,13 @@ class Hand:
         #check full house
         if three_of_a_kind and two_of_a_kind:
             print("\nFull House combination found!");
+            gui.WriteToConsole("\nFull House combination found!")
             ScoreofHand = 8;
             return ScoreofHand;
         # check for straight flush
         if is_straight and is_flush:
             print("\nStraight Flush combination found!");
+            gui.WriteToConsole("\nStraight Flush combination found!")
             player_counts = {'LeadingPlayer': 0, 'NonLeadingPlayer': 0}
             for player in TrackCards:
                 player_counts[player] += 1
@@ -246,11 +333,13 @@ class Hand:
         #check for flush
         elif len(set(suits)) == 1:
             print("\nFlush combination found!");
+            gui.WriteToConsole("\nFlush combination found!")
             ScoreofHand = 6;
             return ScoreofHand;
         # Check for fours
         if max(value_counts.values()) == 4:
             print("\nFours combination found!");
+            gui.WriteToConsole("\nFours combination found!")
             #To find card contribution of players and assign correct scores
             leading_player_count = 0
             non_leading_player_count = 0
@@ -273,25 +362,30 @@ class Hand:
         # Check for one pair
         elif len([x for x in value_counts.values() if x == 2]) == 1:
             print("\nOne pair combination found!");
+            gui.WriteToConsole("\nOne pair combination found!")
             ScoreofHand = 1;
             return ScoreofHand;
         # Check for two pair
         elif len([x for x in value_counts.values() if x == 2]) == 2:
             print("\nTwo pair combination found!");
+            gui.WriteToConsole("\nTwo pair combination found!")
             ScoreofHand = 2;
             return ScoreofHand; 
         # Check for three of a kind
         elif len([x for x in value_counts.values() if x == 3]) == 1:
             print("\nThrees combination found!");
+            gui.WriteToConsole("\nThrees combination found!")
             ScoreofHand = 3;
             return ScoreofHand;
         #Check for straight
         elif is_straight:
             print("\nStraight combination found!");
+            gui.WriteToConsole("\nStraight combination found!")
             ScoreofHand = 5; 
             return ScoreofHand;  
         else:
             ScoreofHand = 0;
             print("\nNo combination found!");
+            gui.WriteToConsole("\nNo combination found!")
             return ScoreofHand;
           
